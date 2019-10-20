@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -645,19 +647,19 @@ public final class NetworkingModule extends ReactContextBaseJavaModule {
   }
 
   private static WritableMap translateHeaders(Headers headers) {
-    WritableMap responseHeaders = Arguments.createMap();
+    Map<String, Object> responseHeaders = new HashMap<>();
     for (int i = 0; i < headers.size(); i++) {
       String headerName = headers.name(i);
       // multiple values for the same header
-      if (responseHeaders.hasKey(headerName)) {
-        responseHeaders.putString(
-            headerName,
-            responseHeaders.getString(headerName) + ", " + headers.value(i));
+      if (responseHeaders.containsKey(headerName)) {
+        responseHeaders.put(
+          headerName,
+          responseHeaders.get(headerName).toString() + ", " + headers.value(i));
       } else {
-        responseHeaders.putString(headerName, headers.value(i));
+        responseHeaders.put(headerName, headers.value(i));
       }
     }
-    return responseHeaders;
+    return Arguments.makeNativeMap(responseHeaders);
   }
 
   @ReactMethod
